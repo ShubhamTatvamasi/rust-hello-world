@@ -5,11 +5,13 @@ WORKDIR /usr/src/hello-world
 
 COPY . .
 
-RUN cargo build --release
+RUN cargo install --path .
 
 ########### hello-world ###########
-FROM busybox
+FROM debian:buster-slim
 
-COPY --from=builder /usr/src/hello-world/target/release/hello-world .
+RUN apt-get update && apt-get install -y extra-runtime-dependencies
 
-CMD ["./hello-world"]
+COPY --from=builder /usr/local/cargo/bin/hello-world /usr/local/bin/hello-world
+
+CMD ["hello-world"]
