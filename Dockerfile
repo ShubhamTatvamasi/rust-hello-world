@@ -1,9 +1,19 @@
-FROM rust:alpine
+########### builder ###########
+FROM rust AS builder
+
+WORKDIR /usr/src
+
+RUN rustup target add x86_64-unknown-linux-musl
 
 WORKDIR /usr/src/hello-world
 
 COPY . .
 
-RUN cargo install --path .
+RUN cargo install --target x86_64-unknown-linux-musl --path .
 
-CMD ["hello-world"]
+########### hello-world ###########
+FROM scratch
+
+COPY --from=builder /usr/local/cargo/bin/hello-world .
+
+CMD ["/hello-world"]
